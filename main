@@ -1,0 +1,35 @@
+function syncCalendar() {
+  //get source and target calendars
+  var sourceCalendarId = //put source calendar ID here
+  var sourceCal = CalendarApp.getCalendarById(sourceCalendarId);
+
+  var targetCalendarID = //put target calendar ID here
+  var targetCal = CalendarApp.getCalendarById(targetCalendarID)
+
+  //get today's date and two weeks from today's date
+  var today = new Date();
+  var endDay = new Date();
+  endDay.setDate(today.getDate()+14);
+
+  //get all events from source calendar
+  var events = sourceCal.getEvents(today, endDay);
+
+  //create events if they do not already exist
+  for (i = 0; i < events.length; i++) {
+    //checking if event exists on target
+    try{
+      var alreadyScheduled = targetCal.getEventsForDay(events[i].getStartTime(), {search: events[i].getTitle()});
+    } catch (e) {continue;}
+
+    if(alreadyScheduled.length == 0) {
+      targetCal.createEvent(events[i].getTitle(), events[i].getStartTime(), events[i].getEndTime(), {location: "Meriam Library 142"});
+    }
+  }
+}
+
+//adds sync button to sheets page
+function onOpen() {
+  var menu = SpreadsheetApp.getUi().createMenu("Sync Calendar");
+  menu.addItem("Sync to Calendar", "syncCalendar")
+  menu.addToUi();
+}
