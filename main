@@ -1,9 +1,9 @@
 function syncCalendar() {
   //get source and target calendars
-  var sourceCalendarId = //put source calendar ID here
+  var sourceCalendarId = //put source calendar id here;
   var sourceCal = CalendarApp.getCalendarById(sourceCalendarId);
 
-  var targetCalendarID = //put target calendar ID here
+  var targetCalendarID = //put target calendar id here;
   var targetCal = CalendarApp.getCalendarById(targetCalendarID)
 
   //get today's date and two weeks from today's date
@@ -19,15 +19,21 @@ function syncCalendar() {
     //checking if event exists on target
     try{
       var alreadyScheduled = targetCal.getEventsForDay(events[i].getStartTime(), {search: events[i].getTitle()});
+      for (var j = 0; j < alreadyScheduled.length; j++) { //checking if event with same name 
+        console.log(alreadyScheduled[j].getStartTime().getTime() != events[i].getStartTime().getTime());
+        if (alreadyScheduled[j].getStartTime().getTime() !== events[i].getStartTime().getTime()) {
+        //remove from already scheduled if different start time to allow it to be copied over
+          alreadyScheduled.splice(j, 1);
+        }
+      }
     } catch (e) {continue;}
 
-    if(alreadyScheduled.length == 0) {
-      targetCal.createEvent(events[i].getTitle(), events[i].getStartTime(), events[i].getEndTime(), {location: "Meriam Library 142"});
+    if(alreadyScheduled.length === 0) {
+      targetCal.createEvent(events[i].getTitle(), events[i].getStartTime(), events[i].getEndTime());
     }
   }
 }
 
-//adds sync button to sheets page
 function onOpen() {
   var menu = SpreadsheetApp.getUi().createMenu("Sync Calendar");
   menu.addItem("Sync to Calendar", "syncCalendar")
